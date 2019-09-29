@@ -79,7 +79,6 @@ class Post(db.Model):
     sold = db.Column(db.Boolean, default = False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow(), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    # photos = db.Column(db.ARRAY(db.String))
     image_filenames = db.Column(db.String, default=None, nullable=True)
     image_urls = db.Column(db.String, default=None, nullable=True)
     interested = db.relationship('Interested', backref='post', lazy='dynamic')
