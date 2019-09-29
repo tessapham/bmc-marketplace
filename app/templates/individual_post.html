@@ -1,0 +1,87 @@
+<!-- Authors: Elia Anagnostou, Tessa Pham -->
+
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="col-md-4" style="text-align: center;min-height: 50%; margin: 5% auto;">
+        <div style="width: 98%; height: 95%; padding: 5%; background-color: #343a40; border-radius: 15px;">
+            <p class="h1"><a href="{{ url_for('post', id=post.id) }}" class="post-title">{{ post.title }} </a></p>
+            <p style="color: white"> by <a href="{{ url_for('user', username=post.author.username) }}">{{ post.author.username }}</a></br>
+                ${{ post.price }}
+            </p>
+            {% set url_list = post.image_urls.split(';') %}
+            {% set filename_list = post.image_filenames.split(';') %}
+            {% set id = "carousel" + id|string %}
+            <div id="{{ id }}" class="carousel slide" data-ride="carousel" style="width: 96%; height: 30%; margin: auto;">
+                <!-- Indicators -->
+                <ul class="carousel-indicators">
+                    {% for url in url_list %}
+                        {% if loop.index == 1 %}
+                        <li data-target="#{{ id }}" data-slide-to="0" class="active"></li>
+                        {% else %}
+                        <li data-target="#{{ id }}" data-slide-to="{{ loop.index - 1 }}"></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <div class="carousel-inner">
+                    {% for url, filename in url_list|zip(filename_list) %}
+                        {% if loop.index == 1 %}
+                        <div class="carousel-item active">
+                        {% else %}
+                        <div class="carousel-item">
+                        {% endif %}
+                            <img src="{{ url_for('static', filename=filename) }}" alt="{{ url }}">
+                        </div>
+                    {% endfor %}
+                    </div>
+                <!-- Left and right controls -->
+                <a class="carousel-control-prev" href="#{{ id }}" data-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </a>
+                <a class="carousel-control-next" href="#{{ id }}" data-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </a>
+            </div>
+            <div style="margin-top: 8%;">
+            {% if current_user.has_interest(post) %}
+            <a href="{{ url_for('interested', post_id=post.id, action='unshow_interest') }}" style="color: white; font-size: 0.95em;" class="btn btn-info btn-lg">
+                <i class="fa fa-thumbs-o-down"></i> Not Interested
+            </a>
+            {% else %}
+            <a href="{{ url_for('interested', post_id=post.id, action='show_interest') }}" style="color: white; font-size: 0.95em;" class="btn btn-info btn-lg">
+                <i class="fa fa-thumbs-o-up"></i> Interested
+            </a>
+            {% endif %}
+            </div>
+            <p style="margin-top: 2%; color: white">
+                {{ post.count_interested() }} other members interested</br>
+            </p>
+        
+            <div class="scroll-comments" style="max-height: 25%; text-align: left; border-radius: 5px;">
+            {% if post.has_comment() %}
+                {% for comment in post.get_comments() %}
+                <div style="color: white;"><p><a href="{{ url_for('user', username=comment.author.username) }}" class="comment-user">{{ comment.author.username }}:</a> {{ comment.text }}</p></div>
+                {% endfor %}
+            {% else %}
+                <div style="color: white"><p>No comments yet!</p></div>
+            {% endif %}
+            </div>
+            <form method="post" action="{{ url_for('comment_post', post_id=post.id) }}">
+                {{ comment_form.hidden_tag() }}
+                <div class="form-group" style="margin-top: 5%;">
+                    {% if comment_form.text.errors %}
+                        {{ comment_form.text(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in comment_form.text.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ comment_form.text(class="form-control form-control-md", placeholder="Write a comment...") }}
+                    {% endif %}
+                </div>
+            </form>
+            
+        </div>
+    </div>
+{% endblock %}

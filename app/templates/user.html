@@ -1,0 +1,206 @@
+
+<!-- Author: Tessa Pham, Xinyi Wang, Elia Anagnostou -->
+
+{% extends "base.html" %}
+
+{% block content %}
+   <table style="margin-left: 1%; margin-top: 5%;">
+       <tr valign="top">
+           <td><img src="{{ user.avatar(128) }}"></td>
+           <td><h1 style="margin: 10% 0% 10% 10%;">User: {{ user.username }}</h1></td>
+       </tr>
+   </table>
+   <h2 style="text-align: center;">My Active Posts</h2>
+   <hr>
+   <div class="row" style="text-align: center; margin-left: 0.1%;">
+   {% for post in posts %}
+        {% if not post.sold %}
+        {% set outer_loop = loop %}
+       <div class="col-md-3" style="height: 600px; margin: 1% 0;">
+           <div style="width: 96%; height: 95%; padding: 5% 2%; background-color: #343a40; border-radius: 15px;">
+               <a href="{{ url_for('delete_post', post_id=post.id) }}">
+                   <button type="button" class="close" aria-label="Close">
+                       <span aria-hidden="true">&times;</span>
+                   </button>
+               </a>
+                <p class="h1"><a href="{{ url_for('post', id=post.id) }}" class="post-title">{{ post.title }} </a></p>
+                <p style="color: white">
+                    by <a href="{{ url_for('user', username=post.author.username) }}">{{ post.author.username }}</a></br>
+                    ${{ post.price }}
+                </p>
+               {% set url_list = post.image_urls.split(';') %}
+               {% set filename_list = post.image_filenames.split(';') %}
+               {% set id = "carousel" + post.id|string %}
+               <div id="{{ id }}" class="carousel slide" data-ride="carousel" style="width: 96%; margin: auto;">
+                   <!-- Indicators -->
+                   <ul class="carousel-indicators">
+                       {% for url in url_list %}
+                           {% if outer_loop.index == 1 %}
+                           <li data-target="#{{ id }}" data-slide-to="0" class="active"></li>
+                           {% else %}
+                           <li data-target="#{{ id }}" data-slide-to="{{ outer_loop.index - 1 }}"></li>
+                           {% endif %}
+                       {% endfor %}
+                   </ul>
+                   <div class="carousel-inner">
+                       {% for url, filename in url_list|zip(filename_list) %}
+                           {% if loop.index == 1 %}
+                           <div class="carousel-item active">
+                           {% else %}
+                           <div class="carousel-item">
+                           {% endif %}
+                               <img src="{{ url_for('static', filename=filename) }}" alt="{{ url }}">
+                           </div>
+                       {% endfor %}
+                       </div>
+                   <!-- Left and right controls -->
+                   <a class="carousel-control-prev" href="#{{ id }}" data-slide="prev">
+                       <span class="carousel-control-prev-icon"></span>
+                   </a>
+                   <a class="carousel-control-next" href="#{{ id }}" data-slide="next">
+                       <span class="carousel-control-next-icon"></span>
+                   </a>
+               </div>
+               <div style="position: static;">
+               <p style="color: white">
+                   <br>
+                   <br>
+                   <a href="{{ url_for('sold', post_id=post.id, action='mark_sold') }}">Mark as Sold</a> </br>
+                   <a href="{{ url_for('post', id=post.id) }}">{{ post.text }}</a></br>
+                   ${{ post.price }}
+               </p>
+               <p style="color: white">
+                   Interested Members: <b> {{ post.get_interested_members() }} </b>
+               </p>
+            </div>
+       </div>
+   </div>
+       {% endif %}
+   {% endfor %}
+   </div>
+   </div>
+
+   <h2 style="text-align: center;">My Sold Posts</h2>
+   <hr>
+    <div class="row" style="text-align: center; margin-left: 0.1%;">
+        {% for post in posts %}
+                {% if post.sold %}
+                {% set outer_loop = loop %}
+            <div class="col-md-3" style="height: 600px; margin: 1% 0;">
+                <div style="width: 96%; height: 95%; padding: 5% 2%; background-color: #343a40; border-radius: 15px;">
+                    <a href="{{ url_for('delete_post', post_id=post.id) }}">
+                        <button type="button" class="close" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </a>
+                        <p class="h1"><a href="{{ url_for('post', id=post.id) }}" class="post-title">{{ post.title }} </a></p>
+                        <p style="color: white">
+                            by <a href="{{ url_for('user', username=post.author.username) }}">{{ post.author.username }}</a></br>
+                            ${{ post.price }}
+                        </p>
+                    {% set url_list = post.image_urls.split(';') %}
+                    {% set filename_list = post.image_filenames.split(';') %}
+                    {% set id = "carousel" + post.id|string %}
+                    <div id="{{ id }}" class="carousel slide" data-ride="carousel" style="width: 96%; margin: auto;">
+                        <!-- Indicators -->
+                        <ul class="carousel-indicators">
+                            {% for url in url_list %}
+                                {% if outer_loop.index == 1 %}
+                                <li data-target="#{{ id }}" data-slide-to="0" class="active"></li>
+                                {% else %}
+                                <li data-target="#{{ id }}" data-slide-to="{{ outer_loop.index - 1 }}"></li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                        <div class="carousel-inner">
+                            {% for url, filename in url_list|zip(filename_list) %}
+                                {% if loop.index == 1 %}
+                                <div class="carousel-item active">
+                                {% else %}
+                                <div class="carousel-item">
+                                {% endif %}
+                                    <img src="{{ url_for('static', filename=filename) }}" alt="{{ url }}">
+                                </div>
+                            {% endfor %}
+                            </div>
+                        <!-- Left and right controls -->
+                        <a class="carousel-control-prev" href="#{{ id }}" data-slide="prev">
+                            <span class="carousel-control-prev-icon"></span>
+                        </a>
+                        <a class="carousel-control-next" href="#{{ id }}" data-slide="next">
+                            <span class="carousel-control-next-icon"></span>
+                        </a>
+                    </div>
+                    <div style="position: static;">
+                    <p style="color: white">
+                        <br>
+                        <br>
+                        <a href="{{ url_for('sold', post_id=post.id, action='unmark_sold') }}">Mark as Available</a> </br>
+                        <a href="{{ url_for('post', id=post.id) }}">{{ post.text }}</a></br>
+                        ${{ post.price }}
+                    </p>
+                    <p style="color: white">
+                        Interested Members: <b> {{ post.get_interested_members() }} </b>
+                    </p>
+                    </div>
+            </div>
+        </div>
+            {% endif %}
+        {% endfor %}
+        </div>
+   </div>
+   <h2 style="text-align: center;">My Interests</h2>
+   <hr>
+   <div class="row" style="text-align: center; margin-left: 0.1%;">
+        {% for interest in interests %}
+            {% set outer_loop = loop %}
+            <div class="col-md-3" style="height: 600px; margin: 1% 0;">
+                <div style="width: 96%; height: 95%; padding: 5% 2%; background-color: #343a40; border-radius: 15px;">
+                     <p class="h1"><a href="{{ url_for('post', id=interest.id) }}" class="post-title">{{ interest.title }} </a></p>
+                     <p style="color: white">
+                         by <a href="{{ url_for('user', username=interest.author.username) }}">{{ interest.author.username }}</a></br>
+                         ${{ interest.price }}
+                     </p>
+                    {% set url_list = interest.image_urls.split(';') %}
+                    {% set filename_list = interest.image_filenames.split(';') %}
+                    {% set id = "carousel" + interest.id|string %}
+                    <div id="{{ id }}" class="carousel slide" data-ride="carousel" style="width: 96%; margin: auto;">
+                        <!-- Indicators -->
+                        <ul class="carousel-indicators">
+                            {% for url in url_list %}
+                                {% if outer_loop.index == 1 %}
+                                <li data-target="#{{ id }}" data-slide-to="0" class="active"></li>
+                                {% else %}
+                                <li data-target="#{{ id }}" data-slide-to="{{ outer_loop.index - 1 }}"></li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                        <div class="carousel-inner">
+                            {% for url, filename in url_list|zip(filename_list) %}
+                                {% if loop.index == 1 %}
+                                <div class="carousel-item active">
+                                {% else %}
+                                <div class="carousel-item">
+                                {% endif %}
+                                    <img src="{{ url_for('static', filename=filename) }}" alt="{{ url }}">
+                                </div>
+                            {% endfor %}
+                            </div>
+                        <!-- Left and right controls -->
+                        <a class="carousel-control-prev" href="#{{ id }}" data-slide="prev">
+                            <span class="carousel-control-prev-icon"></span>
+                        </a>
+                        <a class="carousel-control-next" href="#{{ id }}" data-slide="next">
+                            <span class="carousel-control-next-icon"></span>
+                        </a>
+                    </div>
+                    <p style="color: white">
+                        Interested Members: <b> {{ interest.get_interested_members() }} </b>
+                    </p>
+                 </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}

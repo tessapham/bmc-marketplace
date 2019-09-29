@@ -1,0 +1,129 @@
+<!-- Authors: Zainab Batool, Tessa Pham, Elia Anagnostou, Xinyi Wang-->
+
+{% extends "base.html" %}
+
+{% block content %}
+    <div>
+        <div class="addpost">
+            <h1 style="margin: 5%">Post Your Item</h1>
+            <form action="{{ url_for('index') }} " method="post" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <p>
+                <div style="width: 70%; margin: auto;" class="form-group">
+                    <!-- <h6>{{ form.title.label }}</h6> -->
+                    {{ form.title(class="form-control", placeholder="What are you selling?") }}
+                </div>
+                </p>
+            <p>
+            <div style="width: 70%; margin: auto;" class="form-group">
+                <!-- {{ form.text.label }}<br> -->
+                {{ form.text(class="form-control", placeholder="Describe your item...", rows=3) }}
+            </div>
+            </p>
+            <div style="width: 70%; margin: auto;" class="form-group">
+                <!-- {{ form.price.label }}<br> -->
+                {{ form.price(class="form-control", placeholder="How much is it?") }}<br>
+            </div>
+            <p>
+                <div style="width: 70%;" class="custom-file">
+                    <input type="file" name="images" multiple="" class="custom-file-input" id="customFile">
+                    <label style="text-align: left" class="custom-file-label text-truncate" for="customFile">Add photos...</label>
+                </div>
+            </p>
+            <p>{{ form.submit(class="btn btn-info") }}</p>
+        </form>
+    </div>
+    <div class="toside">
+    <h1 class="welcome">Hello, {{ current_user.username }}!</h1>
+    <p style="text-align: center; font-size: 200%;">Here are available items on sale!</p>
+    <div class="row" style="text-align: center; margin-left: 2%;">
+        {% for post in posts %}
+        {% if not post.if_sold() %}
+        {% set outer_loop = loop %}
+        <div class="col-md-5" style="min-height: 50%; margin: 1% 3% 1% 3%;">
+            <div style="width: 98%; height: 95%; padding: 5%; background-color: #343a40; border-radius: 15px;">
+                <p class="h1"><a href="{{ url_for('post', id=post.id) }}" class="post-title">{{ post.title }} </a></p>
+                <p style="color: white"> by <a href="{{ url_for('user', username=post.author.username) }}">{{ post.author.username }}</a></br>
+                    ${{ post.price }}
+                </p>
+                {% set url_list = post.image_urls.split(';') %}
+                {% set filename_list = post.image_filenames.split(';') %}
+                {% set id = "carousel" + (outer_loop.index - 1)|string %}
+                <div id="{{ id }}" class="carousel slide" data-ride="carousel" style="width: 96%; height: 30%; margin: auto;">
+                    <!-- Indicators -->
+                    <ul class="carousel-indicators">
+                        {% for url in url_list %}
+                            {% if outer_loop.index == 1 %}
+                            <li data-target="#{{ id }}" data-slide-to="0" class="active"></li>
+                            {% else %}
+                            <li data-target="#{{ id }}" data-slide-to="{{ outer_loop.index - 1 }}"></li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                    <div class="carousel-inner">
+                        {% for url, filename in url_list|zip(filename_list) %}
+                            {% if loop.index == 1 %}
+                            <div class="carousel-item active">
+                            {% else %}
+                            <div class="carousel-item">
+                            {% endif %}
+                                <img src="{{ url_for('static', filename=filename) }}" alt="{{ url }}">
+                            </div>
+                        {% endfor %}
+                        </div>
+                    <!-- Left and right controls -->
+                    <a class="carousel-control-prev" href="#{{ id }}" data-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </a>
+                    <a class="carousel-control-next" href="#{{ id }}" data-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </a>
+                </div>
+                <div style="margin-top: 8%;">
+                {% if current_user.has_interest(post) %}
+                <!-- <a href="{{ url_for('interested', post_id=post.id, action='unshow_interest') }}" style="color: black;"><h1>Not Interested</h1></a></br> -->
+                <a href="{{ url_for('interested', post_id=post.id, action='unshow_interest') }}" style="color: white; font-size: 0.95em;" class="btn btn-info btn-lg">
+                    <i class="fa fa-thumbs-o-down"></i> Not Interested
+                </a>
+                {% else %}
+                    <!-- <a href="{{ url_for('interested', post_id=post.id, action='unshow_interest') }}" style="color: black;"><h1>Interested</h1></a></br> -->
+                <a href="{{ url_for('interested', post_id=post.id, action='show_interest') }}" style="color: white; font-size: 0.95em;" class="btn btn-info btn-lg">
+                    <i class="fa fa-thumbs-o-up"></i> Interested
+                </a>
+                {% endif %}
+                </div>
+                <p>
+                    {{ post.count_interested() }} other members interested</br>
+                </p>
+            
+                <div class="scroll-comments" style="max-height: 25%; text-align: left; border-radius: 5px;">
+                {% if post.has_comment() %}
+                    {% for comment in post.get_comments() %}
+                    <div style="color: white;"><p><a href="{{ url_for('user', username=comment.author.username) }}" class="comment-user">{{ comment.author.username }}:</a> {{ comment.text }}</p></div>
+                    {% endfor %}
+                {% else %}
+                    <div style="color: white"><p>No comments yet!</p></div>
+                {% endif %}
+                </div>
+                <form method="post" action="{{ url_for('comment_post', post_id=post.id) }}">
+                    {{ comment_form.hidden_tag() }}
+                    <div class="form-group" style="margin-top: 5%;">
+                        {% if comment_form.text.errors %}
+                            {{ comment_form.text(class="form-control form-control-lg is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in comment_form.text.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ comment_form.text(class="form-control form-control-md", placeholder="Write a comment...") }}
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    </div>
+{% endblock %}

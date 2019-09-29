@@ -1,0 +1,50 @@
+<!-- Authors: Tessa Pham, Zainab Batool, Elia Anagnostou -->
+
+{% extends "base.html" %}
+
+{% block content %}
+<img src="{{url_for('static', filename='logo.svg')}}" alt="logo" width="500px" height="auto" class="float-left" style="margin-top: 8%; margin-left: 15%;">
+<div style="text-align: center; margin-right: 15%; margin-top: 5%;" class="float-right">
+    <h1 style="margin: 0% 5% 15% 5%; font-size: 400%;">Register</h1>
+    <form action="" method="post" class="needs-validation" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.name(class="form-control", placeholder="Name") }}<br>
+            {% for error in form.name.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.email(class="form-control", placeholder="Email") }}<br>
+            {% for error in form.email.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.username(class="form-control", placeholder="New Username") }}<br>
+            {% for error in form.username.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.password(class="form-control", placeholder="Password") }}<br>
+            {% for error in form.password.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.password2(class="form-control", placeholder="Repeat Password") }}<br>
+            {% for error in form.password2.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.venmo_username(class="form-control", placeholder="Venmo Username") }}<br>
+            {% for error in form.venmo_username.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit(class="btn btn-info") }}</p>
+    </form>
+</div>
+{% endblock %}

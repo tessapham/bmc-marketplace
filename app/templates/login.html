@@ -1,0 +1,30 @@
+<!-- Authors: Zainab Batool, Tessa Pham, Elia Anagnostou-->
+
+{% extends "base.html" %}
+
+{% block content %}
+<img src="{{ url_for('static', filename='logo.svg') }}" alt="logo" width="500px" height="auto" class="float-left" style="margin-top: 10%; margin-left: 15%;">
+<div style="text-align: center; margin-right: 15%; margin-top: 10%;" class="float-right">
+    <h1 style="margin: 5% 5% 15% 5%; font-size: 400%;">Log In</h1>
+    <form action="" method="post" class="needs-validation" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            <h5>{{ form.username.label }}</h5>
+            {{ form.username(class="form-control", placeholder="Username") }}
+        </p>
+        <p>
+            <h5>{{ form.password.label }}</h5>
+            {{ form.password(class="form-control", placeholder="Password") }}
+        </p>
+        <p>
+            <h5>{{ form.remember_me(class="form-check-input", type="checkbox") }} {{ form.remember_me.label(class="form-check-label") }}</h5><br>
+        </p>
+
+        <p>{{ form.submit(class="btn btn-info") }}</p>
+        <p>
+            <h6><a href="{{ url_for('reset_password_request') }}" class="base-links">Reset Password</a></h6>
+            <h6><a href="{{ url_for('register') }}" class="base-links">Create an Account</a></h6>
+        </p>
+    </form>
+</div>
+{% endblock %}
